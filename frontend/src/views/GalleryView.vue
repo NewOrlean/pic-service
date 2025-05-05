@@ -61,9 +61,10 @@
 import UploadModal from '../components/UploadModal.vue';
 import ImageCard from '../components/ImageCard.vue';
 import ImagePagination from '../components/ImagePagination.vue';
+import * as imageService from '../services/imageService.js';
 
 export default {
-  components: {UploadModal, ImageCard, ImagePagination},
+  components: { UploadModal, ImageCard, ImagePagination },
   data() {
     return {
       file: null,
@@ -86,7 +87,7 @@ export default {
     this.loadImages();
   },
   methods: {
-    onFileChange({file, fileName, preview}) {
+    onFileChange({ file, fileName, preview }) {
       this.file = file;
       this.fileName = fileName;
       this.preview = preview;
@@ -96,7 +97,7 @@ export default {
       const date = new Date(dateStr);
       return date.toLocaleString();
     },
-    async submitPicture({description}) {
+    async submitPicture({ description }) {
       if (!this.preview || !description) {
         alert("Выберите файл и введите описание");
         return;
@@ -106,17 +107,11 @@ export default {
       this.error = "";
 
       try {
-        const uploadRes = await fetch("http://localhost:8000/upload_image", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            image: this.preview,
-            description: description,
-            created_at: this.created_at,
-          }),
+        await imageService.uploadImage({
+          image: this.preview,
+          description: description,
+          created_at: this.created_at,
         });
-
-        if (!uploadRes.ok) throw new Error("Ошибка при загрузке изображения.");
 
         this.closeUploadPopup();
         this.page = 1;
@@ -136,13 +131,7 @@ export default {
       this.error = "";
 
       try {
-        const res = await fetch(
-            `http://localhost:8000/paginate_images?page=${this.page}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
-        );
-
-        if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера.");
-
-        const data = await res.json();
+        const data = await imageService.getImages(this.page, this.pageSize, this.search);
         console.log("Загруженные данные:", data);
 
         this.images = data.images || [];
@@ -166,15 +155,7 @@ export default {
       this.deleteMessage = "";
 
       try {
-        const res = await fetch("http://localhost:8000/delete_image", {
-          method: "DELETE",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({image_id: imageId}),
-        });
-
-        if (!res.ok) throw new Error("Ошибка при удалении изображения");
-
-        const result = await res.json();
+        const result = await imageService.deleteImage(imageId);
         this.deleteMessage = `Результат удаления: ${result.message}`;
 
         if (this.images.length === 1 && this.page > 1) {
@@ -198,11 +179,7 @@ export default {
         this.error = "";
         try {
           const nextPage = this.page + 1;
-          const res = await fetch(
-              `http://localhost:8000/paginate_images?page=${nextPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
-          );
-          if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера");
-          const data = await res.json();
+          const data = await imageService.getImages(nextPage, this.pageSize, this.search);
           this.images = data.images;
           this.totalPages = data.total_pages;
           this.page = nextPage;
@@ -210,8 +187,8 @@ export default {
           console.error(err);
           this.error = "Ошибка загрузки изображений";
           setTimeout(() => {
-          this.error = "";
-        }, 10000);
+            this.error = "";
+          }, 10000);
         } finally {
           this.loading = false;
         }
@@ -223,11 +200,7 @@ export default {
         this.error = "";
         try {
           const prevPage = this.page - 1;
-          const res = await fetch(
-              `http://localhost:8000/paginate_images?page=${prevPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
-          );
-          if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера");
-          const data = await res.json();
+          const data = await imageService.getImages(prevPage, this.pageSize, this.search);
           this.images = data.images;
           this.totalPages = data.total_pages;
           this.page = prevPage;
@@ -235,8 +208,8 @@ export default {
           console.error(err);
           this.error = "Ошибка загрузки изображений";
           setTimeout(() => {
-          this.error = "";
-        }, 10000);
+            this.error = "";
+          }, 10000);
         } finally {
           this.loading = false;
         }
