@@ -1,8 +1,11 @@
 import cloudinary
+import pymysql
 
 from pathlib import Path
 from backend.config import Config
 
+
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,7 +13,11 @@ SECRET_KEY = 'django-insecure-t=4u*cn2a8fhev*9p)qnk!ce0k0%0=i*m+dxb3d#x^1t5*_(&x
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'pic-service-backend-test.up.railway.app',
+    'localhost',
+    '127.0.0.1'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

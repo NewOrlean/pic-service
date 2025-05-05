@@ -62,6 +62,8 @@ import UploadModal from '../components/UploadModal.vue';
 import ImageCard from '../components/ImageCard.vue';
 import ImagePagination from '../components/ImagePagination.vue';
 
+const backendUrl = process.env.VUE_APP_BACKEND_URL;
+
 export default {
   components: {UploadModal, ImageCard, ImagePagination},
   data() {
@@ -106,7 +108,7 @@ export default {
       this.error = "";
 
       try {
-        const uploadRes = await fetch("http://localhost:8000/upload_image", {
+        const uploadRes = await fetch(`${backendUrl}/upload_image`, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({
@@ -137,7 +139,7 @@ export default {
 
       try {
         const res = await fetch(
-            `http://localhost:8000/paginate_images?page=${this.page}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
+            `${backendUrl}/paginate_images?page=${this.page}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
         );
 
         if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера.");
@@ -166,7 +168,7 @@ export default {
       this.deleteMessage = "";
 
       try {
-        const res = await fetch("http://localhost:8000/delete_image", {
+        const res = await fetch(`${backendUrl}/delete_image`, {
           method: "DELETE",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({image_id: imageId}),
@@ -199,7 +201,7 @@ export default {
         try {
           const nextPage = this.page + 1;
           const res = await fetch(
-              `http://localhost:8000/paginate_images?page=${nextPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
+              `${backendUrl}/paginate_images?page=${nextPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
           );
           if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера");
           const data = await res.json();
@@ -224,7 +226,7 @@ export default {
         try {
           const prevPage = this.page - 1;
           const res = await fetch(
-              `http://localhost:8000/paginate_images?page=${prevPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
+              `${backendUrl}/paginate_images?page=${prevPage}&page_size=${this.pageSize}&search=${encodeURIComponent(this.search)}`
           );
           if (!res.ok) throw new Error("Ошибка при загрузке данных с сервера");
           const data = await res.json();

@@ -237,12 +237,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   width: 100%;
   max-width: 100%;
   padding: 10px;
   font-size: 14px;
-  text-align: center;
   color: white;
   background-color: #AA8F66;
   border-radius: 4px;
@@ -250,9 +248,23 @@ body {
   margin-bottom: 10px;
   user-select: none;
   box-sizing: border-box;
+  position: relative;
+}
+
+.file-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.file-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .file-label input[type="file"] {
